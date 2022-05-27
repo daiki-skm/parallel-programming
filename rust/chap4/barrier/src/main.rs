@@ -11,6 +11,10 @@ struct SpinLock<T> {
     data: UnsafeCell<T>,
 }
 
+struct SpinLockGuard<'a, T> {
+    spin_lock: &'a SpinLock<T>,
+}
+
 impl<T> SpinLock<T> {
     fn new(v: T) -> Self {
         SpinLock {
@@ -39,6 +43,14 @@ unsafe impl<T> Send for SpinLock<T> {}
 impl<'a, T> Drop for SpinLockGuard<'a, T> {
     fn drop(&mut self) {
         self.spin_lock.lock.store(false, Ordering::Release);
+    }
+}
+
+impl<'a, T> Deref for SpinLockGuard<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*self.spin_lock.data.get() }
     }
 }
 
