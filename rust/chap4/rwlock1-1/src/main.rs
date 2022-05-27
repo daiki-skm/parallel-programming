@@ -6,7 +6,9 @@ fn main() {
 
     let t = thread::spawn(move || {
         let flag = val.read().unwrap();
+        println!("{}", flag);
         if *flag {
+            println!("{}", flag);
             *val.write().unwrap() = false;
             println!("flag is true");
         }
