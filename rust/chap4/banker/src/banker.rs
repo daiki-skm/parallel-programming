@@ -52,7 +52,7 @@ impl<const NRES: usize, const NTH: usize> Resource<NRES, NTH> {
         false
     }
 
-    fn take(&mut self, id: usize, request: usize) -> bool {
+    fn take(&mut self, id: usize, resource: usize) -> bool {
         if id >= NTH || resource >= NRES || self.available[resource] == 0 {
             return false;
         }
@@ -61,16 +61,16 @@ impl<const NRES: usize, const NTH: usize> Resource<NRES, NTH> {
         self.available[resource] -= 1;
 
         if self.is_safe() {
-            true;
+            true
         } else {
             self.allocation[id][resource] -= 1;
             self.available[resource] += 1;
-            false;
+            false
         }
     }
 
-    fn release(&mut self, id: usize, release: usize) {
-        if id >= NTH || release >= NRES || self.allocation[id][release] == 0 {
+    fn release(&mut self, id: usize, resource: usize) {
+        if id >= NTH || resource >= NRES || self.allocation[id][resource] == 0 {
             return;
         }
 

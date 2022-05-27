@@ -23,13 +23,13 @@ fn main() {
 
     let philosopher1 = thread::spawn(move || {
         for _ in 0..NUM_LOOP {
-            while !banker0.take(1,1) {}
-            while !banker0.take(1,0) {}
+            while !banker.take(1,1) {}
+            while !banker.take(1,0) {}
 
             println!("1: eating");
 
-            banker0.release(1,1);
-            banker0.release(1,0);
+            banker.release(1,1);
+            banker.release(1,0);
         }
     });
 
