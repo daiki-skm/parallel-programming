@@ -12,7 +12,7 @@ struct reent_lock {
     int cnt;
 };
 
-void reentlocK_acquire(struct reent_lock *lock, int id) {
+void reentlock_acquire(struct reent_lock *lock, int id) {
     if (lock->lock && __atomic_load_n(&lock->id, __ATOMIC_RELAXED) == id) {
         lock->cnt++;
     } else {
@@ -35,7 +35,7 @@ struct reent_lock lock_var;
 void reent_lock_test(int id, int n) {
     if (n==0) return;
 
-    reentlocK_acquire(&lock_var, id);
+    reentlock_acquire(&lock_var, id);
     reent_lock_test(id, n-1);
     reentlock_release(&lock_var);
 }

@@ -1,5 +1,5 @@
 targets = reent
-GFLAGS = -O3 -DNUM_THREADS=4
+CFLAGS = -O3 -DNUM_THREADS=4
 LDFLAGS = -pthread
 
 all: $(targets)

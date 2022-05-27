@@ -1,5 +1,5 @@
 targets = signal
-GFLAGS = -O3
+CFLAGS = -O3
 LDFLAGS = -pthread
 
 all: $(targets)
