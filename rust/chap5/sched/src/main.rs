@@ -27,7 +27,7 @@ impl Hello {
 impl Future for Hello {
     type Output = ();
 
-    fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<()> {
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
         match (*self).state {
             StateHello::HELLO => {
                 println!("Hello, ");
@@ -54,7 +54,7 @@ struct Task {
 }
 
 impl ArcWake for Task {
-    fn wake_by_ref(_arc_self: &Arc<Self>) {
+    fn wake_by_ref(arc_self: &Arc<Self>) {
         let self0 = arc_self.clone();
         arc_self.sender.send(self0).unwrap();
     }
@@ -82,7 +82,7 @@ impl Executor {
 
     fn run(&self) {
         while let Ok(task) = self.receiver.recv() {
-            let future = task.future.lock().unwrap();
+            let mut future = task.future.lock().unwrap();
             let waker = waker_ref(&task);
             let mut ctx = Context::from_waker(&waker);
             let _ = future.as_mut().poll(&mut ctx);
