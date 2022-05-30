@@ -4,7 +4,7 @@ const NUM_TASKS: usize = 4;
 const NUM_LOOP: usize = 100000;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), tokio::task::JoinError> {
     let val = Arc::new(Mutex::new(0));
     let mut v = Vec::new();
     for _ in 0..NUM_TASKS {

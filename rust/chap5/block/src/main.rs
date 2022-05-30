@@ -15,7 +15,7 @@ async fn do_print() {
 #[tokio::main]
 pub async fn main() {
     let mut v = Vec::new();
-    for n in n..32 {
+    for n in 0..32 {
         let t = tokio::task::spawn_blocking(move || do_block(n));
         v.push(t);
     }
