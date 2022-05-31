@@ -23,24 +23,26 @@ fn gaia() {
     }
 }
 
-fn producer() {
+fn producer() { // <1>
     let id = green::spawn(consumer, 2 * 1024 * 1024);
     for i in 0..10 {
         green::send(id, i);
     }
 }
 
-fn consumer() {
+fn consumer() { // <2>
     for _ in 0..10 {
         let msg = green::recv().unwrap();
-        println!("received: count = {}", msg)
+        println!("received: count = {}", msg);
     }
 }
 
 fn main() {
+    // 6.2 協調的グリーンスレッドの実装の実行例
     green::spawn_from_main(gaia, 2 * 1024 * 1024);
 
-    println!("---------------------");
+    println!("--------------------");
 
-    green::spawn_from_main(producer, 2 * 1024 * 1024);
+    // 6.3 アクターモデルの実行例
+    green::spawn_from_main(producer, 2 * 1024 * 1024); // <3>
 }
