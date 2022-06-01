@@ -21,7 +21,7 @@ impl<T> Ticketlock<T> {
         }
     }
 
-    pub fn lock(&self, idx: usize) -> TicketlockGuard<T> {
+    pub fn lock(&self) -> TicketlockGuard<T> {
         let t = self.ticket.fetch_add(1, Ordering::Relaxed);
         while self.turn.load(Ordering::Relaxed) != t {}
         fence(Ordering::Acquire);

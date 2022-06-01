@@ -72,10 +72,10 @@ impl<'a, T> Drop for FairLockGuard<'a, T> {
 
         if fl.waiting[next].load(Ordering::Relaxed) {
             fl.turn.store(next, Ordering::Relaxed);
-            fl.waiting[next].store(false, Ordering::Relearse);
+            fl.waiting[next].store(false, Ordering::Release);
         } else {
             fl.turn.store((next + 1) & MASK, Ordering::Relaxed);
-            fl.lock.store(false, Ordering::Relearse);
+            fl.lock.store(false, Ordering::Release);
         }
     }
 }

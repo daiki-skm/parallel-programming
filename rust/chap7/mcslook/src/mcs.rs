@@ -1,16 +1,16 @@
 use std::cell::UnsafeCell;
 use std::ops::{Deref, DerefMut};
 use std::ptr::null_mut;
-use std::sync::atomic::{AtomicPtr, Ordering, fence, AtomicBool};
+use std::sync::atomic::{fence, AtomicBool, AtomicPtr, Ordering};
 
 pub struct MCSLock<T> {
-    last: AtomicPtr<MCSNode<T>>,
-    data: UnsafeCell<T>,
+last: AtomicPtr<MCSNode<T>>,
+data: UnsafeCell<T>,
 }
 
 pub struct MCSNode<T> {
-    next: AtomicPtr<MCSNode<T>>,
-    locked: AtomicBool,
+next: AtomicPtr<MCSNode<T>>,
+locked: AtomicBool,
 }
 
 pub struct MCSLockGuard<'a, T> {
@@ -18,10 +18,10 @@ pub struct MCSLockGuard<'a, T> {
     mcs_lock: &'a MCSLock<T>,
 }
 
-unsafe impl <T> Send for MCSLock<T> {}
-unsafe impl <T> Sync for MCSLock<T> {}
+unsafe impl<T> Sync for MCSLock<T> {}
+unsafe impl<T> Send for MCSLock<T> {}
 
-impl <T> MCSNode<T> {
+impl<T> MCSNode<T> {
     pub fn new() -> Self {
         MCSNode {
             next: AtomicPtr::new(null_mut()),
@@ -30,7 +30,7 @@ impl <T> MCSNode<T> {
     }
 }
 
-impl <'a, T> Deref for MCSLockGuard<'a, T> {
+impl<'a, T> Deref for MCSLockGuard<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -38,7 +38,7 @@ impl <'a, T> Deref for MCSLockGuard<'a, T> {
     }
 }
 
-impl <'a, T> DerefMut for MCSLockGuard<'a, T> {
+impl<'a, T> DerefMut for MCSLockGuard<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { &mut *self.mcs_lock.data.get() }
     }
@@ -82,8 +82,11 @@ impl<'a, T> Drop for MCSLockGuard<'a, T> {
     fn drop(&mut self) {
         if self.node.next.load(Ordering::Relaxed) == null_mut() {
             let ptr = self.node as *mut MCSNode<T>;
-            if let Ok(_) = self.mcs_lock.compare_exchange(
-                ptr, null_mut(), Ordering::Release, Ordering::Relaxed
+            if let Ok(_) = self.mcs_lock.last.compare_exchange(
+                                                                ptr,
+                                                                null_mut(),
+                                                                Ordering::Release,
+                                                                Ordering::Relaxed,
             ) {
                 return;
             }
@@ -92,6 +95,6 @@ impl<'a, T> Drop for MCSLockGuard<'a, T> {
         while self.node.next.load(Ordering::Relaxed) == null_mut() {}
 
         let next = unsafe { &mut *self.node.next.load(Ordering::Relaxed) };
-        next.locked.store(true, Ordering::Relearse);
+        next.locked.store(false, Ordering::Release);
     }
 }

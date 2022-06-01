@@ -6,7 +6,7 @@ const NUM_THREADS: usize = 4;
 mod mcs;
 
 fn main() {
-    let n = Arc::new(mcs::MCSlock::new(0));
+    let n = Arc::new(mcs::MCSLock::new(0));
     let mut v = Vec::new();
 
     for _ in 0..NUM_THREADS {
@@ -18,6 +18,7 @@ fn main() {
                 *r += 1;
             }
         });
+
         v.push(t);
     }
 
@@ -26,5 +27,10 @@ fn main() {
     }
 
     let mut node = mcs::MCSNode::new();
-    println!("COUNT = {} (expected = {})", *r, NUM_THREADS * NUM_LOOP);
+    let r = n.lock(&mut node);
+    println!(
+        "COUNT = {} (expected = {})",
+        *r,
+        NUM_LOOP * NUM_THREADS
+    );
 }

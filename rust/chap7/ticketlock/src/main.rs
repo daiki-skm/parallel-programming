@@ -24,5 +24,5 @@ fn main() {
         t.join().unwrap();
     }
 
-    println!("COUNT = {} (expected = {})", *lock.lock(0), NUM_THREADS * NUM_LOOP);
+    println!("COUNT = {} (expected = {})", *lock.lock(), NUM_THREADS * NUM_LOOP);
 }
