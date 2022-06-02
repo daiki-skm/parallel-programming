@@ -14,7 +14,7 @@ fn db_server_macro(c: S::Chan<(), DBServer>) {
     let mut c_enter = c.enter();
     let mut db = HashMap::new();
     loop {
-        let c = c_enter();
+        let c = c_enter;
         offer! {c,
             Put => {
                 let (c, key) = c.recv();
@@ -70,10 +70,10 @@ fn db_server(c: S::Chan<(), DBServer>) {
     }
 }
 
-fn db_client(c: S::Chan<C, DBClient>) {
+fn db_client(c: S::Chan<(), DBClient>) {
     let c = c.enter();
     let c = c.sel1().send(10).send(4).zero();
-    let c = c.sel2().send(50).send(7).zero();
+    let c = c.sel1().send(50).send(7).zero();
 
     let (c, val) = c.sel2().sel1().send(10).recv();
     println!("val: {:?}", val);
